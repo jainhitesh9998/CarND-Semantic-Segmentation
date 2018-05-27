@@ -167,6 +167,7 @@ def run():
     BATCH_SIZE = 2
 
     # Download pretrained vgg model
+    print("start")
     helper.maybe_download_pretrained_vgg(data_dir)
 
     # OPTIONAL: Train and Inference on the cityscapes dataset instead of the Kitti dataset.
@@ -189,8 +190,8 @@ def run():
         correct_label = tf.placeholder(dtype = tf.int32, shape =  [None, None, None, num_classes], name = "correct_label")
         vgg_input_tensor, vgg_keep_prob_tensor, vgg_layer3_out_tensor, vgg_layer4_out_tensor, vgg_layer7_out_tensor = \
                 load_vgg(sess, vgg_path)
-        nn_last_layer =  layers(vgg_layer3_out_tensor, vgg_layer4_out_tensor, vgg_layer7_out_tensor\
-                            num_classes)
+        nn_last_layer =  layers(vgg_layer3_out_tensor, vgg_layer4_out_tensor, vgg_layer7_out_tensor,\
+                num_classes)
         logits, train_op, cross_entropy_loss = optimize(layer_output, correct_label, learning_rate, num_classes)
 
         # TODO: Train NN using the train_nn function
@@ -205,4 +206,5 @@ def run():
 
 
 if __name__ == '__main__':
+    print("inside main")
     run()
