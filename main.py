@@ -4,7 +4,7 @@ import helper
 import warnings
 from distutils.version import LooseVersion
 import project_tests as tests
-
+import tqdm as tqdm
 
 # Check TensorFlow Version
 assert LooseVersion(tf.__version__) >= LooseVersion('1.0'), 'Please use TensorFlow version 1.0 or newer.  You are using {}'.format(tf.__version__)
@@ -137,7 +137,7 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     sess.run(tf.global_variables_initializer())
     print("Training Function")
 
-    for epoch in  range(0, epochs):
+    for epoch in  tqdm(range(0, epochs)):
         print()
         print("Epoch : {}".format(epoch + 1))
         loss = None
