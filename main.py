@@ -57,96 +57,54 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     # TODO: Implement function
     regularizer_scale = 1e-3
     stddev_value = 0.01
-    l2_regularizer = tf.contrib.layers.l2_regularizer
+    l2_regularizer = tf.contrib.layers.l2_regularizer(scale = 1e-3)
 
     #1 x 1 convolution
     conv_1_1_layer_7 = tf.layers.conv2d(inputs = vgg_layer7_out, filters = num_classes, kernel_size = (1,1),\
-                        padding = 'same', activation = tf.nn.relu ,\
-                        kernel_initializer = tf.truncated_normal_initializer(stddev_value),\
-                        kernel_regularizer = l2_regularizer(scale = regularizer_scale))
+                        padding = 'same', \
+                        #kernel_initializer = tf.truncated_normal_initializer(stddev_value),\
+                        kernel_regularizer = l2_regularizer\
+                                       )
+    
+    conv_1_1_layer_4 = tf.layers.conv2d(inputs = vgg_layer4_out, filters = num_classes, kernel_size = (1,1),\
+                        padding = 'same', \
+                        #kernel_initializer = tf.truncated_normal_initializer(stddev_value),\
+                        kernel_regularizer = l2_regularizer\
+                                       )
+    
+    conv_1_1_layer_3 = tf.layers.conv2d(inputs = vgg_layer3_out, filters = num_classes, kernel_size = (1,1),\
+                        padding = 'same',\
+                        #kernel_initializer = tf.truncated_normal_initializer(stddev_value),\
+                        kernel_regularizer = l2_regularizer\
+                                       )
 
     conv_1_1_layer_7_upsampled = tf.layers.conv2d_transpose(inputs = conv_1_1_layer_7, filters = num_classes,\
-                        kernel_size = (4,4), strides = (2,2), padding = 'same', activation = tf.nn.relu ,\
-                        kernel_initializer = tf.truncated_normal_initializer(stddev_value),\
-                        kernel_regularizer = l2_regularizer(scale = regularizer_scale))
-
-    conv_1_1_layer_4 = tf.layers.conv2d(inputs = vgg_layer4_out, filters = num_classes, kernel_size = (1,1),\
-                        padding = 'same', activation = tf.nn.relu ,\
-                        kernel_initializer = tf.truncated_normal_initializer(stddev_value),\
-                        kernel_regularizer = l2_regularizer(scale = regularizer_scale))
+                        kernel_size = (4,4), strides = (2,2), padding = 'same', \
+                        #kernel_initializer = tf.truncated_normal_initializer(stddev_value),\
+                        kernel_regularizer = l2_regularizer\
+                                       )
 
     layer_4_skip = tf.add(conv_1_1_layer_7_upsampled, conv_1_1_layer_4)
 
     conv_layer_4_skip_upsampled = tf.layers.conv2d_transpose(inputs = layer_4_skip, filters = num_classes,\
-                        kernel_size = (4,4), strides = (2,2), padding = 'same', activation = tf.nn.relu ,\
-                        kernel_initializer = tf.truncated_normal_initializer(stddev_value),\
-                        kernel_regularizer = l2_regularizer(scale = regularizer_scale))
+                        kernel_size = (4,4), strides = (2,2), padding = 'same',\
+                        #kernel_initializer = tf.truncated_normal_initializer(stddev_value),\
+                        kernel_regularizer = l2_regularizer\
+                                       )
 
-    conv_1_1_layer_3 = tf.layers.conv2d(inputs = vgg_layer3_out, filters = num_classes, kernel_size = (1,1),\
-                        padding = 'same', activation = tf.nn.relu ,\
-                        kernel_initializer = tf.truncated_normal_initializer(stddev_value),\
-                        kernel_regularizer = l2_regularizer(scale = regularizer_scale))
 
     layer_3_skip = tf.add(conv_layer_4_skip_upsampled, conv_1_1_layer_3)
 
     nn_last_layer = tf.layers.conv2d_transpose(inputs = layer_3_skip, filters = num_classes,\
-                        kernel_size = (16,16), strides = (8,8), padding = 'same', activation = tf.nn.relu ,\
-                        kernel_regularizer = l2_regularizer(scale = regularizer_scale))
+                        kernel_size = (16,16), strides = (8,8), padding = 'same', \
+                        #kernel_initializer = tf.truncated_normal_initializer(stddev_value), \
+                        kernel_regularizer = l2_regularizer
+                                       )
 
     return nn_last_layer
 
 tests.test_layers(layers)
 
-def layers_without_regularization(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
-    """
-    Create the layers for a fully convolutional network.  Build skip-layers using the vgg layers.
-    :param vgg_layer3_out: TF Tensor for VGG Layer 3 output
-    :param vgg_layer4_out: TF Tensor for VGG Layer 4 output
-    :param vgg_layer7_out: TF Tensor for VGG Layer 7 output
-    :param num_classes: Number of classes to classify
-    :return: The Tensor for the last layer of output
-    """
-    # TODO: Implement function
-    stddev_value = 0.01
-
-    #1 x 1 convolution
-    conv_1_1_layer_7 = tf.layers.conv2d(inputs = vgg_layer7_out, filters = num_classes, kernel_size = (1,1),\
-                        padding = 'same', activation = tf.nn.relu6 ,\
-                        kernel_initializer = tf.truncated_normal_initializer(stddev_value),\
-                        )
-
-    conv_1_1_layer_7_upsampled = tf.layers.conv2d_transpose(inputs = conv_1_1_layer_7, filters = num_classes,\
-                        kernel_size = (4,4), strides = (2,2), padding = 'same',\
-                        kernel_initializer = tf.truncated_normal_initializer(stddev_value),\
-                        )
-
-    conv_1_1_layer_4 = tf.layers.conv2d(inputs = vgg_layer4_out, filters = num_classes, kernel_size = (1,1),\
-                        padding = 'same', activation = tf.nn.relu6 ,\
-                        kernel_initializer = tf.truncated_normal_initializer(stddev_value),\
-                        )
-
-    layer_4_skip = tf.add(conv_1_1_layer_7_upsampled, conv_1_1_layer_4)
-
-    conv_layer_4_skip_upsampled = tf.layers.conv2d_transpose(inputs = layer_4_skip, filters = num_classes,\
-                        kernel_size = (4,4), strides = (2,2), padding = 'same',\
-                        kernel_initializer = tf.truncated_normal_initializer(stddev_value),\
-                        )
-
-    conv_1_1_layer_3 = tf.layers.conv2d(inputs = vgg_layer3_out, filters = num_classes, kernel_size = (1,1),\
-                        padding = 'same', activation = tf.nn.relu6 ,\
-                        kernel_initializer = tf.truncated_normal_initializer(stddev_value),\
-                        )
-
-    layer_3_skip = tf.add(conv_layer_4_skip_upsampled, conv_1_1_layer_3)
-
-    nn_last_layer = tf.layers.conv2d_transpose(inputs = layer_3_skip, filters = num_classes,\
-                        kernel_size = (16,16), strides = (8,8), padding = 'same',\
-                        kernel_initializer = tf.truncated_normal_initializer(stddev_value),\
-                        )
-
-    return nn_last_layer
-
-tests.test_layers(layers_without_regularization)
 
 
 def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
@@ -194,13 +152,13 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     for epoch in  tqdm(range(epochs)):
         print()
         print("Epoch : {}".format(epoch + 1))
-        loss = None
+        
         for image, label in tqdm(get_batches_fn(batch_size)):
             _, loss = sess.run([train_op, cross_entropy_loss], feed_dict = {\
                     input_image: image,
                     correct_label: label,
-                    keep_prob: 0.5,
-                    learning_rate: 0.00015
+                    keep_prob: 0.8,
+                    learning_rate: 0.000095
                 })
             #print("Batch Loss: {}".format(loss))
         print("----------------------")
@@ -246,14 +204,13 @@ def run():
                 load_vgg(sess, vgg_path)
         nn_last_layer =  layers(vgg_layer3_out_tensor, vgg_layer4_out_tensor, vgg_layer7_out_tensor,\
                 num_classes)
-        '''nn_last_layer = layers_without_regularization(vgg_layer3_out_tensor, vgg_layer4_out_tensor, vgg_layer7_out_tensor,\
-                num_classes)'''
+        
         logits, train_op, cross_entropy_loss = optimize(nn_last_layer, correct_label, learning_rate, num_classes)
 
         # TODO: Train NN using the train_nn function
         train_nn(sess = sess, epochs = EPOCHS, batch_size = BATCH_SIZE, get_batches_fn = get_batches_fn, \
                 train_op = train_op, cross_entropy_loss = cross_entropy_loss, input_image = vgg_input_tensor,
-             correct_label = correct_label, keep_prob = vgg_keep_prob_tensor, learning_rate = learning_rate)
+           correct_label = correct_label, keep_prob = vgg_keep_prob_tensor, learning_rate = learning_rate)
         # TODO: Save inference data using helper.save_inference_samples
         #  helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
         helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, vgg_keep_prob_tensor, vgg_input_tensor)
